@@ -1,8 +1,6 @@
 /**
- * 표음 변환 진입점 — LLM(Gemini) 우선, 규칙 기반 폴백.
- *
- * GEMINI_API_KEY 설정 시: Gemini Flash로 자연스러운 한글 표음
- * 미설정 시: 내장 IPA 규칙 기반 변환 (epitran 대체)
+ * 표음 변환 진입점 — Gemini LLM 기반.
+ * GEMINI_API_KEY 필수. 미설정 시 에러 반환.
  */
 
 import type { Language, PhoneticMode, PhoneticResult } from "./types";
@@ -12,10 +10,9 @@ import { convertChinese } from "./chinese";
 export * from "./types";
 export { TONE_VISUALS } from "./tone";
 
-/** 매우 단순한 언어 감지: CJK 또는 병음 성조 숫자 패턴이면 중국어로 본다. */
 export function detectLanguage(text: string): Language {
-  if (/[一-鿿]/.test(text)) return "zh"; // 한자
-  if (/[a-z]+[1-5]\b/i.test(text)) return "zh"; // 병음 성조표기
+  if (/[一-鿿]/.test(text)) return "zh";
+  if (/[a-z]+[1-5]\b/i.test(text)) return "zh";
   return "en";
 }
 
@@ -24,7 +21,6 @@ export interface ConvertOptions {
   mode?: PhoneticMode;
 }
 
-/** 텍스트를 한글 표음 음절 배열로 변환한다. LLM 우선, 규칙 기반 폴백. */
 export async function convert(
   text: string,
   opts: ConvertOptions = {},
@@ -41,6 +37,7 @@ export async function convert(
     }
   }
 
+  // 규칙 기반 폴백 (API 키 없거나 LLM 실패 시)
   const syllables =
     language === "zh"
       ? convertChinese(text, mode)

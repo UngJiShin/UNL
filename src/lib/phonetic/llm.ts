@@ -6,7 +6,7 @@
 import type { Language, PhoneticMode, PhoneticResult, PhoneticSyllable } from "./types";
 
 const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 function makeEnglishPrompt(text: string): string {
   return `Convert each English word to Korean phonetic transcription (한글 발음).
